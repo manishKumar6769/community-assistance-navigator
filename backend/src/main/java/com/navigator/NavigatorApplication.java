@@ -1,4 +1,4 @@
-package com.navigator.navigator;
+package com.navigator;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
