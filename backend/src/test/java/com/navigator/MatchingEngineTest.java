@@ -85,4 +85,22 @@ class MatchingEngineTest {
 
         assertTrue(good > weak);
     }
+
+    @Test
+    void freshVerifiedResourceScoresHigherThanOldUnverifiedResource() {
+        Assessment a = assessment();
+
+        Resource fresh = resource("Jamshedpur", "OPEN", 90);
+        fresh.setLastVerifiedDate(java.time.LocalDate.now().toString());
+        fresh.setVerificationStatus("VERIFIED");
+
+        Resource old = resource("Jamshedpur", "OPEN", 90);
+        old.setLastVerifiedDate(java.time.LocalDate.now().minusDays(200).toString());
+        old.setVerificationStatus("UNVERIFIED");
+
+        int freshScore = engine.score(a, fresh);
+        int oldScore = engine.score(a, old);
+
+        assertTrue(freshScore > oldScore);
+    }
 }

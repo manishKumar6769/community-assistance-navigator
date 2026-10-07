@@ -1,5 +1,8 @@
 package com.navigator.matching;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import org.springframework.stereotype.Component;
 
 import com.navigator.model.Assessment;
@@ -109,8 +112,39 @@ public class MatchingEngine {
     }
 
     private double reliability(Resource r) {
-        int s = r.getReliabilityScore() == null ? 50 : r.getReliabilityScore();
-        return Math.max(0, Math.min(100, s)) / 100.0;
+        int baseScore = r.getReliabilityScore() == null ? 50 : r.getReliabilityScore();
+        baseScore = Math.max(0, Math.min(100, baseScore));
+
+        double freshnessScore = 1.0;
+
+        if (r.getLastVerifiedDate() != null && !r.getLastVerifiedDate().isBlank()) {
+            try {
+                LocalDate verifiedDate = LocalDate.parse(r.getLastVerifiedDate());
+                long daysOld = ChronoUnit.DAYS.between(verifiedDate, LocalDate.now());
+
+                if (daysOld <= 30) {
+                    freshnessScore = 1.0;
+                } else if (daysOld <= 90) {
+                    freshnessScore = 0.8;
+                } else if (daysOld <= 180) {
+                    freshnessScore = 0.6;
+                } else {
+                    freshnessScore = 0.4;
+                }
+            } catch (Exception e) {
+                freshnessScore = 0.5;
+            }
+        }
+
+        double verificationScore = "VERIFIED".equalsIgnoreCase(r.getVerificationStatus())
+                ? 1.0
+                : 0.7;
+
+        double combinedScore = (baseScore / 100.0) * 0.6
+                + freshnessScore * 0.25
+                + verificationScore * 0.15;
+
+        return Math.max(0.0, Math.min(1.0, combinedScore));
     }
 
     private double preference(Assessment a, Resource r) {
