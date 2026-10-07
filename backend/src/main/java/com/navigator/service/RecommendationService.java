@@ -22,8 +22,8 @@ public class RecommendationService {
     private final MatchingEngine engine;
 
     public RecommendationService(AssessmentRepository assessmentRepository,
-                                 ResourceRepository resourceRepository,
-                                 MatchingEngine engine) {
+            ResourceRepository resourceRepository,
+            MatchingEngine engine) {
         this.assessmentRepository = assessmentRepository;
         this.resourceRepository = resourceRepository;
         this.engine = engine;
@@ -39,6 +39,9 @@ public class RecommendationService {
 
         List<Map<String, Object>> ranked = new ArrayList<>();
         for (Resource r : candidates) {
+            if (!engine.isEligible(assessment, r)) {
+                continue;
+            }
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("matchScore", engine.score(assessment, r));
             item.put("resource", r);

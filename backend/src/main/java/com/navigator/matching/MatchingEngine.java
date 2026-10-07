@@ -7,7 +7,8 @@ import com.navigator.model.Resource;
 
 /**
  * Simple first version. Member 4 can improve or replace this class.
- * Weights: Eligibility 30, Location 25, Availability 20, Reliability 15, Preference 10.
+ * Weights: Eligibility 30, Location 25, Availability 20, Reliability 15,
+ * Preference 10.
  */
 @Component
 public class MatchingEngine {
@@ -20,6 +21,26 @@ public class MatchingEngine {
         total += reliability(r) * 15;
         total += preference(a, r) * 10;
         return (int) Math.round(total);
+    }
+
+    public boolean isEligible(Assessment a, Resource r) {
+        if (a.getAge() != null && r.getMinAge() != null
+                && a.getAge() < r.getMinAge()) {
+            return false;
+        }
+        if (a.getAge() != null && r.getMaxAge() != null
+                && a.getAge() > r.getMaxAge()) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(r.getStudentOnly())
+                && !Boolean.TRUE.equals(a.getIsStudent())) {
+            return false;
+        }
+        if (a.getIncomeLevel() != null && r.getMaxIncomeLevel() != null
+                && incomeRank(a.getIncomeLevel()) > incomeRank(r.getMaxIncomeLevel())) {
+            return false;
+        }
+        return true;
     }
 
     /** Returns 0.0 to 1.0 */
@@ -50,23 +71,40 @@ public class MatchingEngine {
 
     private int incomeRank(String level) {
         switch (level.toUpperCase()) {
-            case "LOW": return 1;
-            case "MEDIUM": return 2;
-            default: return 3;
+            case "LOW":
+                return 1;
+            case "MEDIUM":
+                return 2;
+            default:
+                return 3;
         }
     }
 
     private double location(Assessment a, Resource r) {
-        if (a.getLocation() == null || r.getLocation() == null) return 0;
-        return a.getLocation().equalsIgnoreCase(r.getLocation()) ? 1.0 : 0.0;
+        if (a.getLocation() == null || r.getLocation() == null) {
+            return 0.0;
+        }
+
+        String userLocation = a.getLocation().trim();
+        String resourceLocation = r.getLocation().trim();
+
+        if (userLocation.isBlank() || resourceLocation.isBlank()) {
+            return 0.0;
+        }
+
+        return userLocation.equalsIgnoreCase(resourceLocation) ? 1.0 : 0.0;
     }
 
     private double availability(Resource r) {
-        if (r.getAvailability() == null) return 0.5;
+        if (r.getAvailability() == null)
+            return 0.5;
         switch (r.getAvailability().toUpperCase()) {
-            case "OPEN": return 1.0;
-            case "LIMITED": return 0.5;
-            default: return 0.0;
+            case "OPEN":
+                return 1.0;
+            case "LIMITED":
+                return 0.5;
+            default:
+                return 0.0;
         }
     }
 
@@ -76,7 +114,14 @@ public class MatchingEngine {
     }
 
     private double preference(Assessment a, Resource r) {
-        // Placeholder: full marks for now. Member 4 can refine this.
-        return 1.0;
+        if (a.getPreference() == null || a.getPreference().isBlank()
+                || r.getServices() == null || r.getServices().isBlank()) {
+            return 0.5;
+        }
+
+        String preference = a.getPreference().trim().toLowerCase();
+        String services = r.getServices().toLowerCase();
+
+        return services.contains(preference) ? 1.0 : 0.0;
     }
 }

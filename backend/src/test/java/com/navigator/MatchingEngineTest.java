@@ -44,4 +44,45 @@ class MatchingEngineTest {
         int s = engine.score(assessment(), resource("Jamshedpur", "OPEN", 100));
         assertTrue(s >= 0 && s <= 100);
     }
+
+    @Test
+    void matchingPreferenceScoresHigher() {
+        Assessment a = assessment();
+        a.setPreference("food");
+
+        Resource matching = resource("Jamshedpur", "OPEN", 90);
+        matching.setServices("Food assistance and groceries");
+
+        Resource nonMatching = resource("Jamshedpur", "OPEN", 90);
+        nonMatching.setServices("Education support");
+
+        int good = engine.score(a, matching);
+        int weak = engine.score(a, nonMatching);
+
+        assertTrue(good > weak);
+    }
+
+    @Test
+    void ineligibleResourceIsRejected() {
+        Assessment a = assessment();
+        a.setIsStudent(false);
+
+        Resource r = resource("Jamshedpur", "OPEN", 90);
+        r.setStudentOnly(true);
+
+        assertTrue(!engine.isEligible(a, r));
+    }
+
+    @Test
+    void reliabilityAffectsScore() {
+        Assessment a = assessment();
+
+        Resource reliable = resource("Jamshedpur", "OPEN", 90);
+        Resource unreliable = resource("Jamshedpur", "OPEN", 30);
+
+        int good = engine.score(a, reliable);
+        int weak = engine.score(a, unreliable);
+
+        assertTrue(good > weak);
+    }
 }
