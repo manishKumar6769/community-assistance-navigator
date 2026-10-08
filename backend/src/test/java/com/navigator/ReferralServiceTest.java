@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.navigator.model.Referral;
+import com.navigator.model.Resource;
 import com.navigator.repository.ReferralRepository;
 import com.navigator.repository.ResourceRepository;
 import com.navigator.service.ReferralService;
@@ -67,5 +68,29 @@ class ReferralServiceTest {
         referral.setAssessmentId("assessment-1");
         referral.setStatus("REQUESTED");
         return referral;
+    }
+
+    @Test
+    void incorrectInfoReducesResourceReliability() {
+        Referral referral = existingReferral();
+        referral.setStatus("NOT_RECEIVED");
+        referral.setFailureReason("INCORRECT_INFO");
+
+        Resource resource = new Resource();
+        resource.setResourceId("resource-1");
+        resource.setReliabilityScore(80);
+
+        when(repository.findById("ref-1")).thenReturn(referral);
+        when(resourceRepository.findById("resource-1")).thenReturn(resource);
+        when(repository.save(referral)).thenReturn(referral);
+        when(resourceRepository.save(resource)).thenReturn(resource);
+
+        Referral updated = service.updateStatus(
+                "ref-1",
+                "NOT_RECEIVED",
+                "INCORRECT_INFO");
+
+        assertEquals("NOT_RECEIVED", updated.getStatus());
+        assertEquals(75, resource.getReliabilityScore());
     }
 }
