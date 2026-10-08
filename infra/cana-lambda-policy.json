@@ -1,0 +1,13 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"dynamodb:Scan",
+				"dynamodb:UpdateItem"
+			],
+			"Resource": "arn:aws:dynamodb:ap-south-1:416964654377:table/cana-Resources"
+		}
+	]
+}
