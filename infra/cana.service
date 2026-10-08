@@ -1,0 +1,13 @@
+[Unit]
+Description=Community Assistance Navigator
+After=network.target
+
+[Service]
+User=ec2-user
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=S3_BUCKET=cana-verification-docs-416964654377
+ExecStart=/usr/bin/java -jar /opt/cana/hello.jar
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
