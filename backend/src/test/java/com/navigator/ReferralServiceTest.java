@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import com.navigator.model.Referral;
 import com.navigator.repository.ReferralRepository;
+import com.navigator.repository.ResourceRepository;
 import com.navigator.service.ReferralService;
 
 class ReferralServiceTest {
 
     private final ReferralRepository repository = mock(ReferralRepository.class);
-    private final ReferralService service = new ReferralService(repository);
+    private final ResourceRepository resourceRepository = mock(ResourceRepository.class);
+    private final ReferralService service = new ReferralService(repository, resourceRepository);
 
     @Test
     void createStartsWithRequestedStatus() {
@@ -40,8 +42,7 @@ class ReferralServiceTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> service.updateStatus("ref-1", "NOT_RECEIVED", null)
-        );
+                () -> service.updateStatus("ref-1", "NOT_RECEIVED", null));
     }
 
     @Test

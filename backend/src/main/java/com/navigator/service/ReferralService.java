@@ -8,20 +8,24 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.navigator.model.Referral;
+import com.navigator.model.Resource;
 import com.navigator.repository.ReferralRepository;
+import com.navigator.repository.ResourceRepository;
 
 @Service
 public class ReferralService {
 
-    private static final Set<String> STATUSES =
-            Set.of("REQUESTED", "CONTACTED", "RECEIVED", "NOT_RECEIVED");
-    private static final Set<String> FAILURE_REASONS =
-            Set.of("NO_RESPONSE", "NOT_ELIGIBLE", "TOO_FAR", "UNAVAILABLE", "INCORRECT_INFO");
+    private static final Set<String> STATUSES = Set.of("REQUESTED", "CONTACTED", "RECEIVED", "NOT_RECEIVED");
+    private static final Set<String> FAILURE_REASONS = Set.of("NO_RESPONSE", "NOT_ELIGIBLE", "TOO_FAR", "UNAVAILABLE",
+            "INCORRECT_INFO");
 
     private final ReferralRepository repository;
+    private final ResourceRepository resourceRepository;
 
-    public ReferralService(ReferralRepository repository) {
+    public ReferralService(ReferralRepository repository,
+            ResourceRepository resourceRepository) {
         this.repository = repository;
+        this.resourceRepository = resourceRepository;
     }
 
     public Referral create(Referral input) {
@@ -42,7 +46,9 @@ public class ReferralService {
         return repository.findByUserId(userId);
     }
 
-    /** Returns null if not found. Throws IllegalArgumentException for invalid input. */
+    /**
+     * Returns null if not found. Throws IllegalArgumentException for invalid input.
+     */
     public Referral updateStatus(String id, String status, String failureReason) {
         if (status == null || !STATUSES.contains(status)) {
             throw new IllegalArgumentException(
@@ -63,6 +69,33 @@ public class ReferralService {
         existing.setStatus(status);
         existing.setFailureReason(failureReason);
         existing.setUpdatedAt(Instant.now().toString());
-        return repository.save(existing);
+
+        Referral saved = repository.save(existing);
+        updateResourceReliability(saved);
+
+        return saved;
+    }
+
+    private void updateResourceReliability(Referral referral) {
+        if (!"NOT_RECEIVED".equals(referral.getStatus())
+                || !"INCORRECT_INFO".equals(referral.getFailureReason())) {
+            return;
+        }
+
+        Resource resource = resourceRepository.findById(referral.getResourceId());
+
+        if (resource == null) {
+            return;
+        }
+
+        int score = resource.getReliabilityScore() == null
+                ? 50
+                : resource.getReliabilityScore();
+
+        score -= 5;
+        score = Math.max(0, score);
+
+        resource.setReliabilityScore(score);
+        resourceRepository.save(resource);
     }
 }
