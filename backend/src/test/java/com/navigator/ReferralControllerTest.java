@@ -1,6 +1,7 @@
 package com.navigator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.navigator.controller.GlobalExceptionHandler;
 import com.navigator.controller.ReferralController;
 import com.navigator.model.Referral;
 import com.navigator.model.Resource;
@@ -49,7 +51,9 @@ class ReferralControllerTest {
                 resources.get(invocation.getArgument(0)));
 
         ReferralService service = new ReferralService(referralRepository, resourceRepository);
-        mockMvc = MockMvcBuilders.standaloneSetup(new ReferralController(service)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new ReferralController(service))
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
     }
 
     @Test
@@ -104,6 +108,15 @@ class ReferralControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"NOT_RECEIVED\",\"failureReason\":\"BAD_REASON\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void listWithoutUserIdReturnsBadRequest() throws Exception {
+        mockMvc.perform(get("/api/referrals"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Validation failed"))
+                .andExpect(jsonPath("$.message").value("Required query parameter is missing"));
     }
 
     private org.springframework.test.web.servlet.ResultActions createReferral(String userId,
