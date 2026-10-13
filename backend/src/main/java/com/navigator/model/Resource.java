@@ -20,6 +20,8 @@ public class Resource {
     private String lastVerifiedDate;
     private String verificationStatus;
     private Integer reliabilityScore;
+    private Integer freshnessScore;
+    private String freshnessCheckedAt;
 
     public Resource() {}
 
@@ -65,4 +67,9 @@ public class Resource {
 
     public Integer getReliabilityScore() { return reliabilityScore; }
     public void setReliabilityScore(Integer reliabilityScore) { this.reliabilityScore = reliabilityScore; }
+    public Integer getFreshnessScore() { return freshnessScore; }
+    public void setFreshnessScore(Integer freshnessScore) { this.freshnessScore = freshnessScore; }
+
+    public String getFreshnessCheckedAt() { return freshnessCheckedAt; }
+    public void setFreshnessCheckedAt(String freshnessCheckedAt) { this.freshnessCheckedAt = freshnessCheckedAt; }
 }
