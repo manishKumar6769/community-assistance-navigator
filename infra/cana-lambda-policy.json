@@ -5,9 +5,10 @@
 			"Effect": "Allow",
 			"Action": [
 				"dynamodb:Scan",
-				"dynamodb:UpdateItem"
+				"dynamodb:UpdateItem",
+				"dynamodb:DescribeTable"
 			],
-			"Resource": "arn:aws:dynamodb:ap-south-1:416964654377:table/cana-Resources"
+			"Resource": "arn:aws:dynamodb:ap-south-1:416964654377:table/Resources"
 		}
 	]
 }

@@ -11,11 +11,23 @@
                 "dynamodb:DeleteItem",
                 "dynamodb:Query",
                 "dynamodb:Scan",
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
                 "dynamodb:DescribeTable"
             ],
             "Resource": [
-                "arn:aws:dynamodb:ap-south-1:416964654377:table/cana-*",
-                "arn:aws:dynamodb:ap-south-1:416964654377:table/cana-*/index/*"
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Users",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Users/index/*",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Resources",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Resources/index/*",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Assessments",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Assessments/index/*",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Referrals",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Referrals/index/*",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Feedback",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Feedback/index/*",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Documents",
+                "arn:aws:dynamodb:ap-south-1:416964654377:table/Documents/index/*"
             ]
         },
         {
