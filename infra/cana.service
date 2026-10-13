@@ -6,7 +6,9 @@ After=network.target
 User=ec2-user
 Environment=SPRING_PROFILES_ACTIVE=prod
 Environment=S3_BUCKET=cana-verification-docs-416964654377
-ExecStart=/usr/bin/java -jar /opt/cana/hello.jar
+Environment=SERVER_PORT=8081
+Environment=AWS_REGION=ap-south-1
+ExecStart=/usr/bin/java -jar /opt/cana/navigator.jar
 Restart=always
 
 [Install]
