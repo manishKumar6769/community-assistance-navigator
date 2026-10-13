@@ -16,6 +16,7 @@ const CATEGORY_MAPPING = {
   Education: "Education",
   Healthcare: "Health",
   Employment: "Employment",
+  "Financial Assistance": "Financial Assistance",
 };
 
 const EMPTY_REQUEST = {
