@@ -25,3 +25,6 @@ replay_pid*
 
 *.pem
 .env
+
+# Local backup files
+*.bak
