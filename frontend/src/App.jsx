@@ -1,3 +1,4 @@
+import AdminAnalytics from "./AdminAnalytics";
 import { useState, useEffect } from "react";
 import "./App.css";
 import {
@@ -31,6 +32,7 @@ const STATUS_LABELS = {
 };
 
 function App() {
+const [showAnalytics, setShowAnalytics] = useState(false);
 const [showAuth, setShowAuth] = useState(false);
 const [authMode, setAuthMode] = useState("login");
 const [authLoading, setAuthLoading] = useState(false);
@@ -299,6 +301,15 @@ const [authData, setAuthData] = useState({
           <a href="#">Home</a>
           <a href="#results">Find Help</a>
           <a href="#my-requests">My Requests</a>
+          <button
+  className="login-btn"
+  onClick={() => {
+    setShowAnalytics((previous) => !previous);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }}
+>
+  {showAnalytics ? "Back to Home" : "Admin Analytics"}
+</button>
 
 
 
@@ -325,6 +336,7 @@ const [authData, setAuthData] = useState({
 
         </nav>
       </header>
+      {showAnalytics && <AdminAnalytics />}
 
       {/* Hero */}
       <main className="hero">

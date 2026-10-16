@@ -1,0 +1,82 @@
+
+.analytics-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  color: #1f2937;
+}
+
+.analytics-eyebrow {
+  color: #0d9488;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.analytics-page h1 {
+  margin-bottom: 8px;
+  font-size: 32px;
+}
+
+.analytics-subtitle {
+  margin-bottom: 28px;
+  color: #64748b;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+}
+
+.analytics-card,
+.analytics-panel {
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.analytics-card p {
+  margin: 0 0 12px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.analytics-card h2 {
+  margin: 0;
+  color: #0f766e;
+  font-size: 30px;
+}
+
+.analytics-panel {
+  margin-top: 24px;
+}
+
+.analytics-panel h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.analytics-panel ul {
+  padding: 0;
+  list-style: none;
+}
+
+.analytics-panel li {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.analytics-error {
+  color: #b91c1c;
+}
+
+@media (max-width: 600px) {
+  .analytics-page {
+    padding: 24px 16px;
+  }
+}

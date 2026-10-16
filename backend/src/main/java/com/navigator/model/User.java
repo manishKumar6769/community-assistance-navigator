@@ -1,7 +1,9 @@
+
 package com.navigator.model;
 
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
 
 @DynamoDbBean
 public class User {
@@ -32,6 +34,7 @@ public class User {
         this.name = name;
     }
 
+    @DynamoDbSecondaryPartitionKey(indexNames = "EmailIndex")
     public String getEmail() {
         return email;
     }
