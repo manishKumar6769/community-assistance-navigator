@@ -83,3 +83,16 @@ export function submitFeedback(referralId, rating, comment) {
 export function getAnalytics() {
   return request("/api/admin/analytics");
 }
+export async function registerUser(name, email, password) {
+  return request("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  });
+}
+
+export async function loginUser(email, password) {
+  return request("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}

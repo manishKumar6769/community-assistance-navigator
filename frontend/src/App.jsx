@@ -7,7 +7,11 @@ import {
   getMyReferrals,
   updateReferralStatus,
   submitFeedback,
+  loginUser,
+  registerUser,
 } from "./api";
+import { getUserId } from "./api";
+
 
 const categories = ["Education", "Health", "Food", "Legal", "Employment"];
 
@@ -27,6 +31,23 @@ const STATUS_LABELS = {
 };
 
 function App() {
+const [showAuth, setShowAuth] = useState(false);
+const [authMode, setAuthMode] = useState("login");
+const [authLoading, setAuthLoading] = useState(false);
+const [authError, setAuthError] = useState("");
+const [currentUser, setCurrentUser] = useState(() => {
+  try {
+    return JSON.parse(localStorage.getItem("navigatorUser") || "null");
+  } catch {
+    return null;
+  }
+});
+
+const [authData, setAuthData] = useState({
+  name: "",
+  email: "",
+  password: "",
+});
   const [selectedCategory, setSelectedCategory] = useState("");
   const [assessment, setAssessment] = useState({
     location: "",
@@ -57,6 +78,77 @@ function App() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // Load my requests from the backend
+
+  const handleAuthChange = (event) => {
+    const { name, value } = event.target;
+
+    setAuthData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+
+    setAuthError("");
+  };
+
+  const handleAuthSubmit = async (event) => {
+    event.preventDefault();
+    setAuthError("");
+
+    if (!authData.email.trim() || !authData.password) {
+      setAuthError("Please enter your email and password.");
+      return;
+    }
+
+    if (
+      authMode === "register" &&
+      (!authData.name.trim() || authData.password.length < 8)
+    ) {
+      setAuthError(
+        "Enter your name and use a password with at least 8 characters."
+      );
+      return;
+    }
+
+    setAuthLoading(true);
+
+    try {
+      const user =
+        authMode === "register"
+          ? await registerUser(
+              authData.name.trim(),
+              authData.email.trim(),
+              authData.password
+            )
+          : await loginUser(
+              authData.email.trim(),
+              authData.password
+            );
+
+      setCurrentUser(user);
+      localStorage.setItem("navigatorUser", JSON.stringify(user));
+
+      if (user.userId) {
+        localStorage.setItem("navigatorUserId", user.userId);
+      }
+
+      setShowAuth(false);
+      setAuthData({ name: "", email: "", password: "" });
+      await loadMyRequests();
+    } catch (error) {
+      setAuthError(error.message || "Login or registration failed.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("navigatorUser");
+    localStorage.removeItem("navigatorUserId");
+    setCurrentUser(null);
+    setMyRequests([]);
+    setShowAuth(false);
+  };
+
   const loadMyRequests = async () => {
     try {
       const list = await getMyReferrals();
@@ -208,7 +300,29 @@ function App() {
           <a href="#results">Find Help</a>
           <a href="#my-requests">My Requests</a>
 
-          <button className="login-btn">Login</button>
+
+
+{currentUser ? (
+  <button
+    className="login-btn"
+    onClick={handleLogout}
+  >
+    Logout
+  </button>
+) : (
+  <button
+    className="login-btn"
+    onClick={() => {
+      setAuthMode("login");
+      setAuthError("");
+      setShowAuth(true);
+    }}
+  >
+    Login
+  </button>
+)}
+
+
         </nav>
       </header>
 
@@ -653,6 +767,105 @@ function App() {
 
         <p>Find the right help. Follow it through. Learn what works.</p>
       </footer>
+
+{showAuth && (
+  <div className="auth-overlay">
+    <div className="auth-modal">
+      <button
+        type="button"
+        className="auth-close"
+        onClick={() => {
+          setShowAuth(false);
+          setAuthError("");
+        }}
+      >
+        ✕
+      </button>
+
+      <h2>
+        {authMode === "login" ? "Welcome Back" : "Create Your Account"}
+      </h2>
+
+      <p>
+        {authMode === "login"
+          ? "Log in to continue finding community support."
+          : "Register to get started."}
+      </p>
+
+      <form onSubmit={handleAuthSubmit}>
+        {authMode === "register" && (
+          <>
+            <label htmlFor="auth-name">Full Name</label>
+            <input
+              id="auth-name"
+              name="name"
+              type="text"
+              placeholder="Enter your name"
+              value={authData.name}
+              onChange={handleAuthChange}
+              required
+            />
+          </>
+        )}
+
+        <label htmlFor="auth-email">Email Address</label>
+        <input
+          id="auth-email"
+          name="email"
+          type="email"
+          placeholder="Enter your email"
+          value={authData.email}
+          onChange={handleAuthChange}
+          required
+        />
+
+        <label htmlFor="auth-password">Password</label>
+        <input
+          id="auth-password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          value={authData.password}
+          onChange={handleAuthChange}
+          minLength={authMode === "register" ? 8 : undefined}
+          required
+        />
+
+        {authError && (
+          <p className="auth-error" role="alert">{authError}</p>
+        )}
+
+        <button
+          type="submit"
+          className="submit-request-btn"
+          disabled={authLoading}
+        >
+          {authLoading
+            ? "Please wait..."
+            : authMode === "login"
+              ? "Login"
+              : "Create Account"}
+        </button>
+      </form>
+
+      <p className="auth-switch">
+        {authMode === "login"
+          ? "Don't have an account?"
+          : "Already have an account?"}{" "}
+        <button
+          type="button"
+          onClick={() => {
+            setAuthMode(authMode === "login" ? "register" : "login");
+            setAuthError("");
+          }}
+        >
+          {authMode === "login" ? "Register" : "Login"}
+        </button>
+      </p>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
